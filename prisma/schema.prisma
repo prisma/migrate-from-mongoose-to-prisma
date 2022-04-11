@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type UserProfile {
+  id  String  @map("_id") @db.ObjectId
+  bio String?
+}
+
+model Category {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  //  remove the v from the models
+  v    Int    @map("__v")
+  name String
+}
+
+model Post {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+
+  v      Int    @map("__v")
+  // rename these relations  and add the @relation
+  author String @db.ObjectId
+  categories String[] @db.ObjectId
+  content    String
+  // add a default of false here
+  published  Boolean
+  title      String
+}
+
+model User {
+  id      String      @id @default(auto()) @map("_id") @db.ObjectId
+  v       Int         @map("__v")
+  email   String      @unique(map: "email_1")
+  name    String
+  profile UserProfile
+}
