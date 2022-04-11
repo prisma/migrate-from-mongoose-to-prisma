@@ -4,6 +4,8 @@ const Schema = mongoose.Schema
 
 const ProfileSchema = new Schema({
   bio: String
+}, {
+  collection: 'Profile'
 })
 
 const UserSchema = new Schema({
