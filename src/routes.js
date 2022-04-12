@@ -8,17 +8,16 @@ const router = express.Router()
  * Post routes
  */
 
-router.get('/feed', feed)
 /**
- * filter in feed maybe?
+ * filter is now handled by /feed
  */
-router.get("/filterPosts")
+router.get('/feed', feed)
 
 router.post('/post', createDraft)
 
 router.get('/post/:id', getPostById)
 
-router.put('/post/:id', publishDraft) 
+router.put('/post/:id', publishDraft)
 
 router.put('/post/:id/:categoryId', addPostToCategory)
 

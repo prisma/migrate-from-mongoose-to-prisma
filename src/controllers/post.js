@@ -36,11 +36,29 @@ const addPostToCategory = async (req, res) => {
 
 /**
  * GET /feed
- * TODO: filters here...
  */
 const feed = async (req, res) => {
   try {
-    const feed = await Post.find({ published: true })
+    const { searchString, skip, take } = req.query
+
+    const or = searchString !== undefined ? {
+      $or: [
+        { title: { $regex: searchString, $options: "i" } },
+        { content: { $regex: searchString, $options: "i" } },
+      ]
+    } : {}
+
+    const feed = await Post.find(
+      {
+        ...or,
+        published: true,
+      },
+      null,
+      {
+        skip,
+        batchSize: take,
+      }
+    )
       .populate({ path: 'author', model: User })
       .populate('categories')
 
