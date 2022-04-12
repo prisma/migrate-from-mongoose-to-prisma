@@ -29,7 +29,6 @@ const addPostToCategory = async (req, res) => {
     if (!post) return res.status(404).json({ message: 'Post not found' })
     return res.status(200).json(post)
   } catch (error) {
-    console.log({ error })
     return res.status(500).json(error)
   }
 }
