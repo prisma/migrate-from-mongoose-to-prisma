@@ -14,9 +14,10 @@ const UserSchema = new Schema({
     type: String,
     unique: true,
   },
+  // an empty embedded document is created here anyway
   profile: {
     type: ProfileSchema,
-    default: {}
+    default: () => ({})
   }
 }, {
   collection: 'User'
