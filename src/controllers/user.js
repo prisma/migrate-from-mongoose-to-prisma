@@ -1,4 +1,4 @@
-const User = require('../models/user')
+const prisma = require('../prisma')
 
 /**
  * POST /user
@@ -9,9 +9,11 @@ const createUser = async (req, res) => {
   const { name, email } = req.body
 
   try {
-    const user = await User.create({
-      name,
-      email,
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+      }
     })
 
     return res.status(201).json(user)
@@ -31,13 +33,19 @@ const setUserBio = async (req, res) => {
   const { bio } = req.body
 
   try {
-    const user = await User.findByIdAndUpdate(
-      id,
-      { profile: { bio } },
+    const user = await prisma.user.update({
+      where: {
+        id
+      },
+      data: {
+        profile: {
+          bio,
+        }
+      },
 
-    )
+    })
 
-    return res.json(user)
+    return res.status(200).json(user)
   } catch (error) {
     console.log(error)
     return res.status(500).json(error)

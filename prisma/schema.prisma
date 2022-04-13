@@ -14,7 +14,7 @@ type UsersProfile {
 model Category {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
-  v    Int    @map("__v") @ignore
+  v    Int?   @map("__v") @ignore
 
   posts    Post[]   @relation(fields: [post_ids], references: [id])
   post_ids String[] @db.ObjectId
@@ -26,8 +26,8 @@ model Post {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   content   String
-  published Boolean
-  v         Int     @map("__v") @ignore
+  published Boolean @default(false)
+  v         Int?    @map("__v") @ignore
 
   author   User   @relation(fields: [authorId], references: [id])
   authorId String @map("author") @db.ObjectId
@@ -40,7 +40,7 @@ model Post {
 
 model User {
   id      String        @id @default(auto()) @map("_id") @db.ObjectId
-  v       Int           @map("__v") @ignore
+  v       Int?          @map("__v") @ignore
   email   String        @unique(map: "email_1")
   name    String
   profile UsersProfile?
@@ -49,37 +49,4 @@ model User {
   @@map("users")
 }
 
-/// - default(false)
-/// versionKey @ignore
-/// map
-// type UserProfile {
-//   id  String  @map("_id") @db.ObjectId
-//   bio String?
-// }
 
-// model Category {
-//   id   String @id @default(auto()) @map("_id") @db.ObjectId
-//   v    Int    @map("__v")
-//   name String
-// }
-
-// model Post {
-//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-//   title     String
-//   content   String
-//   published Boolean @default(false) // added this
-
-//   v          Int      @map("__v") // exclude this from Prisma Client
-//   // rename these relations  and add the @relation
-//   author     String   @db.ObjectId
-//   categories String[] @db.ObjectId
-//   // add a default of false here
-// }
-
-// model User {
-//   id      String      @id @default(auto()) @map("_id") @db.ObjectId
-//   v       Int         @map("__v")
-//   email   String      @unique(map: "email_1")
-//   name    String
-//   profile UserProfile
-// }

@@ -1,8 +1,4 @@
-const async = require('async')
-
-const Post = require('../models/post')
-const User = require('../models/user')
-const Category = require('../models/category')
+const prisma = require('../prisma')
 
 /**
  * PUT /addPostToCategory
@@ -14,12 +10,17 @@ const addPostToCategory = async (req, res) => {
   const { id, categoryId } = req.query
 
   try {
-    const category = await Category.findOne({ id: categoryId })
-
-    if (!category) return res.status(404).json({ message: 'Category not found' })
-
-    const post = await Post.findByIdAndUpdate(id, {
-      categories: [ { _id: categoryId } ]
+    const post = await prisma.post.update({
+      where: {
+        id
+      },
+      data: {
+        categories: {
+          connect: {
+            id: categoryId
+          }
+        }
+      }
     })
 
     if (!post) return res.status(404).json({ message: 'Post not found' })
@@ -33,20 +34,32 @@ const addPostToCategory = async (req, res) => {
 
 /**
  * GET /feed
- * TODO: filters here...
  */
 const feed = async (req, res) => {
   try {
-    const feed = await Post.find({ published: true })
-      .populate({ path: 'author', model: User })
-      .populate('categories')
+    const { searchString, skip, take } = req.query
+
+    const or = searchString ? {
+      OR: [
+        { title: { contains: searchString } },
+        { content: { contains: searchString } },
+      ],
+    } : {}
+
+    const feed = await prisma.post.findMany({
+      where: {
+        published: true,
+        ...or,
+      },
+      include: { author: true, categories: true },
+      take: Number(take) || undefined,
+      skip: Number(skip) || undefined,
+    })
 
     return res.status(200).json(feed)
   } catch (error) {
     return res.status(500).json(error)
-
   }
-
 }
 
 /**
@@ -60,15 +73,16 @@ const createDraft = async (req, res) => {
   const { title, content, authorEmail } = req.body
 
   try {
-    const author = await User.findOne({ email: authorEmail })
-
-    if (!author) return res.status(404).json({ message: 'Author not found' })
-
-    const draft = await Post.create({
-      title,
-      content,
-      authorId: author._id,
-
+    const draft = await prisma.post.create({
+      data: {
+        title,
+        content,
+        author: {
+          connect: {
+            email: authorEmail
+          }
+        },
+      }
     })
 
     res.status(201).json(draft)
@@ -77,38 +91,6 @@ const createDraft = async (req, res) => {
   }
 }
 
-/**
- * GET
- * query string
- * searchString: string - optional
- */
-// const filterPosts = async (req, res) => {
-//   const { searchString } = req.query
-
-//   try {
-//     const searchedPost = await Post.findAll({
-//       where: {
-//         [ Op.or ]: [
-//           {
-//             title: {
-//               [ Op.like ]: `%${searchString}%`,
-//             },
-//           },
-//           {
-//             content: {
-//               [ Op.like ]: `%${searchString}%`,
-//             },
-//           },
-//         ],
-//       },
-//       include: "author",
-//     })
-
-//     res.json(searchedPost)
-//   } catch (error) {
-//     return res.status(500).json(error)
-//   }
-// }
 
 /**
  * GET /post/:id
@@ -119,12 +101,13 @@ const getPostById = async (req, res) => {
   const { id } = req.params
 
   try {
-    const post = await Post.findOne({ id })
-      .populate({ path: 'author', model: User })
-      .populate('categories')
+    const post = await prisma.post.findUnique({
+      where: { id }
+    })
 
+    if (!post) return res.status(404).json({ message: "Post not found" })
 
-    return res.json(post)
+    return res.status(200).json(post)
   } catch (error) {
     return res.status(500).json(error)
   }
@@ -139,7 +122,10 @@ const publishDraft = async (req, res) => {
   const { id } = req.params
 
   try {
-    const post = await Post.findByIdAndUpdate({ id }, { published: true })
+    const post = await prisma.post.update({
+      where: { id },
+      data: { published: true }
+    })
     return res.status(200).json(post)
   } catch (error) {
     return res.status(500).json(error)
@@ -155,7 +141,9 @@ const createCategory = async (req, res) => {
   const { name } = req.body
 
   try {
-    const category = await Category.create({ name })
+    const category = await prisma.category.create({
+      data: { name }
+    })
 
     return res.status(201).json(category)
   } catch (error) {
@@ -167,7 +155,6 @@ module.exports = {
   feed,
   createDraft,
   addPostToCategory,
-  // filterPosts,
   getPostById,
   createCategory,
   publishDraft,
