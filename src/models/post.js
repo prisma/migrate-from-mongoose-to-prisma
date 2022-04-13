@@ -20,9 +20,6 @@ const PostSchema = new Schema({
       ref: 'Category'
     }
   ]
-}, {
-  // name the Collection => default collection is pluralized and in lowercase
-  collection: 'Post'
 })
 
 module.exports = mongoose.model('Post', PostSchema)

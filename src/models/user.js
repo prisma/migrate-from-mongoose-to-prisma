@@ -5,7 +5,7 @@ const Schema = mongoose.Schema
 const ProfileSchema = new Schema({
   bio: String
 }, {
-  collection: 'Profile'
+  _id: false,
 })
 
 const UserSchema = new Schema({
@@ -19,8 +19,6 @@ const UserSchema = new Schema({
     type: ProfileSchema,
     default: () => ({})
   }
-}, {
-  collection: 'User'
 })
 
 
