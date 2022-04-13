@@ -7,35 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-type UserProfile {
-  id  String  @map("_id") @db.ObjectId
-  bio String?
+type UsersProfile {
+  bio String
 }
 
 model Category {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
-  //  remove the v from the models
-  v    Int    @map("__v")
   name String
+  v    Int    @map("__v") @ignore
+
+  posts    Post[]   @relation(fields: [post_ids], references: [id])
+  post_ids String[] @db.ObjectId
+
+  @@map("categories")
 }
 
 model Post {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  published Boolean
+  v         Int     @map("__v") @ignore
 
-  v      Int    @map("__v")
-  // rename these relations  and add the @relation
-  author String @db.ObjectId
-  categories String[] @db.ObjectId
-  content    String
-  // add a default of false here
-  published  Boolean
-  title      String
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String @map("author") @db.ObjectId
+
+  categories   Category[] @relation(fields: [category_ids], references: [id])
+  category_ids String[]   @db.ObjectId
+
+  @@map("posts")
 }
 
 model User {
-  id      String      @id @default(auto()) @map("_id") @db.ObjectId
-  v       Int         @map("__v")
-  email   String      @unique(map: "email_1")
+  id      String        @id @default(auto()) @map("_id") @db.ObjectId
+  v       Int           @map("__v") @ignore
+  email   String        @unique(map: "email_1")
   name    String
-  profile UserProfile
+  profile UsersProfile?
+  posts   Post[]
+
+  @@map("users")
 }
+
+/// - default(false)
+/// versionKey @ignore
+/// map
+// type UserProfile {
+//   id  String  @map("_id") @db.ObjectId
+//   bio String?
+// }
+
+// model Category {
+//   id   String @id @default(auto()) @map("_id") @db.ObjectId
+//   v    Int    @map("__v")
+//   name String
+// }
+
+// model Post {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   title     String
+//   content   String
+//   published Boolean @default(false) // added this
+
+//   v          Int      @map("__v") // exclude this from Prisma Client
+//   // rename these relations  and add the @relation
+//   author     String   @db.ObjectId
+//   categories String[] @db.ObjectId
+//   // add a default of false here
+// }
+
+// model User {
+//   id      String      @id @default(auto()) @map("_id") @db.ObjectId
+//   v       Int         @map("__v")
+//   email   String      @unique(map: "email_1")
+//   name    String
+//   profile UserProfile
+// }
