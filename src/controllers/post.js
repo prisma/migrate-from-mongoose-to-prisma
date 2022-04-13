@@ -1,5 +1,3 @@
-const async = require('async')
-
 const Post = require('../models/post')
 const User = require('../models/user')
 const Category = require('../models/category')
@@ -66,7 +64,6 @@ const feed = async (req, res) => {
     return res.status(500).json(error)
 
   }
-
 }
 
 /**
@@ -96,38 +93,6 @@ const createDraft = async (req, res) => {
   }
 }
 
-/**
- * GET
- * query string
- * searchString: string - optional
- */
-// const filterPosts = async (req, res) => {
-//   const { searchString } = req.query
-
-//   try {
-//     const searchedPost = await Post.findAll({
-//       where: {
-//         [ Op.or ]: [
-//           {
-//             title: {
-//               [ Op.like ]: `%${searchString}%`,
-//             },
-//           },
-//           {
-//             content: {
-//               [ Op.like ]: `%${searchString}%`,
-//             },
-//           },
-//         ],
-//       },
-//       include: "author",
-//     })
-
-//     res.json(searchedPost)
-//   } catch (error) {
-//     return res.status(500).json(error)
-//   }
-// }
 
 /**
  * GET /post/:id

@@ -7,18 +7,12 @@ const User = require('../models/user')
  * email: string - required
  */
 const createUser = async (req, res) => {
-  const { name, email, bio } = req.body
+  const { name, email } = req.body
 
   try {
     const user = await User.create({
       name,
       email,
-      /** 
-       * set default value of embedded document to null if no value is provided
-      */
-      profile: bio !== undefined ? {
-        bio
-      } : null
     })
 
     return res.status(201).json(user)
@@ -44,6 +38,8 @@ const setUserBio = async (req, res) => {
       { new: true }
     )
 
+    if (!user) return res.status(404).json({ message: 'Author not found' })
+
     return res.json(user)
   } catch (error) {
     return res.status(500).json(error)
@@ -51,9 +47,13 @@ const setUserBio = async (req, res) => {
 }
 
 const getAuthors = async (req, res) => {
-  const users = await User.find({}).populate({ path: 'posts', model: post })
+  try {
+    const users = await User.find({}).populate({ path: 'posts', model: post })
 
-  return res.json(users)
+    return res.status(500).json(users)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
 }
 
 module.exports = {
