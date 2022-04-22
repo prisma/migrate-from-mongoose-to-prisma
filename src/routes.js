@@ -6,11 +6,7 @@ const router = express.Router()
 
 /** 
  * Post routes
- */
-
-/**
- * filter is now handled by /feed
- */
+*/
 router.get('/feed', feed)
 
 router.post('/post', createDraft)
