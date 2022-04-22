@@ -40,7 +40,7 @@ const setUserBio = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'Author not found' })
 
-    return res.json(user)
+    return res.status(200).json(user)
   } catch (error) {
     return res.status(500).json(error)
   }
@@ -50,7 +50,7 @@ const getAuthors = async (req, res) => {
   try {
     const users = await User.find({}).populate({ path: 'posts', model: post })
 
-    return res.status(500).json(users)
+    return res.status(200).json(users)
   } catch (error) {
     return res.status(500).json(error)
   }
