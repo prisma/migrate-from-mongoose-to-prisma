@@ -7,7 +7,7 @@ const prisma = require('../prisma')
  * categoryId string
  */
 const addPostToCategory = async (req, res) => {
-  const { id, categoryId } = req.query
+  const { id, categoryId } = req.params
 
   try {
     const post = await prisma.post.update({
@@ -16,9 +16,11 @@ const addPostToCategory = async (req, res) => {
       },
       data: {
         categories: {
-          connect: {
-            id: categoryId
-          }
+          connect: [
+            {
+              id: categoryId
+            }
+          ]
         }
       }
     })
